@@ -33,6 +33,8 @@ jobs:
         run: python scripts/build.py
       - name: Check page links
         run: python scripts/check_links.py
+      - name: Verify translations and repeatable build
+        run: python tests/i18n_test.py
       - name: Verify SEO output
         run: python scripts/check_seo.py
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d

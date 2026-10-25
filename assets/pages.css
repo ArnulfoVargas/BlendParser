@@ -462,3 +462,12 @@ html { caret-color:var(--color-accent); }
  .four nav .navlinks,.docs-page > header > nav .navlinks { width:100%; justify-content:space-between; }
 }
 @media(prefers-reduced-motion:reduce) { .navlinks a,.navlinks .nav-action { transition:none; } }
+.language-switch { display:flex; gap:var(--space-sm); align-items:center; flex-shrink:0; }
+.language-switch a { font-size:14px; padding:var(--space-xs); border-radius:var(--radius-input); text-decoration:none; }
+.language-switch a[aria-current='true'] { background:var(--color-paper-3); color:var(--color-accent-deep); text-decoration:underline; }
+.language-switch a:hover { background:var(--color-paper-3); text-decoration:underline; }
+@media(max-width:1200px) {
+ .four .friendly-opening > nav,.docs-page > header > nav { flex-wrap:wrap; padding-block:var(--space-md); row-gap:var(--space-sm); }
+ .language-switch { margin-left:auto; }
+}
+@media(max-width:700px) { .language-switch { width:100%; justify-content:flex-end; } }

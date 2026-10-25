@@ -14,7 +14,7 @@ function filter(){
   if(!section.hidden)count++;
   const link=links.find(a=>a.hash==='#'+section.id);if(link)link.hidden=section.hidden;
  }
- status.textContent=query?`${count} de ${sections.length} secciones.`:'';
+ status.textContent=query?(document.documentElement.lang==='en'?`${count} of ${sections.length} sections.`:`${count} de ${sections.length} secciones.`):'';
  document.querySelector('.doc-empty').hidden=count!==0;
 }
 search.addEventListener('input',filter);

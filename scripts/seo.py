@@ -18,10 +18,15 @@ class Headings(HTMLParser):
   if self.active:self.parts.append(data.strip())
 pages={
  'index.html':('BlendParser: convierte Blender a 3MF multicolor','Convierte modelos de Blender en 3MF multicolor para Bambu Studio. Ajusta colores, pinta en 3D y descarga BlendParser para Windows o Linux.',''),
- 'docs.html':('Guía de BlendParser: colores, pincel y exportación 3MF','Aprende a usar BlendParser: importar modelos de Blender, preparar colores y malla, pintar, exportar a Bambu Studio y resolver problemas.','docs.html')
+ 'docs.html':('Guía de BlendParser: colores, pincel y exportación 3MF','Aprende a usar BlendParser: importar modelos de Blender, preparar colores y malla, pintar, exportar a Bambu Studio y resolver problemas.','docs.html'),
+ 'en/index.html':('BlendParser: convert Blender to multicolor 3MF','Convert Blender models to multicolor 3MF for Bambu Studio. Adjust colors, paint in 3D and download BlendParser for Windows or Linux.','en/'),
+ 'en/docs.html':('BlendParser guide: colors, brush and 3MF export','Learn to use BlendParser: import Blender models, prepare colors and meshes, paint, export to Bambu Studio and troubleshoot common issues.','en/docs.html')
 }
 for filename,(title,description,route) in pages.items():
  path=ROOT/filename;s=path.read_text(encoding='utf-8');url=BASE+route
+ language='en' if filename.startswith('en/') else 'es'
+ home=BASE+('en/' if language=='en' else '')
+ is_docs=filename.endswith('docs.html')
  if not route:
   # Serve the same first frame the automatic tour starts with, avoiding an extra hero image download.
   def initial_controls(match):
@@ -34,22 +39,29 @@ for filename,(title,description,route) in pages.items():
  s=re.sub(r'<!-- seo:start -->.*?<!-- seo:end -->','',s,flags=re.S)
  s=re.sub(r'<title>.*?</title>',f'<title>{escape(title)}</title>',s,count=1,flags=re.S)
  s=re.sub(r'<meta name="description"[^>]*>',f'<meta name="description" content="{escape(description,quote=True)}">',s,count=1)
- graph=[{'@type':'WebSite','@id':BASE+'#website','url':BASE,'name':'BlendParser','inLanguage':'es'}]
- app={'@type':'SoftwareApplication','@id':BASE+'#application','name':'BlendParser','url':BASE,'description':pages['index.html'][1],'applicationCategory':'MultimediaApplication','operatingSystem':'Windows, Linux','isAccessibleForFree':True,'license':APP_REPO+'/blob/main/LICENSE','downloadUrl':APP_REPO+'/releases','softwareHelp':{'@id':BASE+'docs.html#guide'},'image':BASE+'assets/social-preview.png','screenshot':BASE+'assets/blendparser-app.png','sameAs':APP_REPO,'inLanguage':'es'}
+ graph=[{'@type':'WebSite','@id':BASE+'#website','url':BASE,'name':'BlendParser','inLanguage':['es','en']}]
+ app={'@type':'SoftwareApplication','@id':home+'#application','name':'BlendParser','url':home,'description':pages['en/index.html' if language=='en' else 'index.html'][1],'applicationCategory':'MultimediaApplication','operatingSystem':'Windows, Linux','isAccessibleForFree':True,'license':APP_REPO+'/blob/main/LICENSE','downloadUrl':APP_REPO+'/releases','softwareHelp':{'@id':home+'docs.html#guia'},'image':BASE+'assets/social-preview.png','screenshot':BASE+'assets/blendparser-app.png','sameAs':APP_REPO,'inLanguage':language}
  if snapshot.get('tag_name'):app['softwareVersion']=snapshot['tag_name']
  graph.append(app)
- if route:
+ if is_docs:
   headings=Headings();headings.feed(s)
-  graph.extend([{'@type':'TechArticle','@id':url+'#guide','url':url,'headline':title,'description':description,'inLanguage':'es','isPartOf':{'@id':BASE+'#website'},'about':{'@id':BASE+'#application'},'articleSection':headings.items},
-  {'@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'BlendParser','item':BASE},{'@type':'ListItem','position':2,'name':'Documentación','item':url}]}])
- else:graph.append({'@type':'WebPage','@id':BASE+'#webpage','url':BASE,'name':title,'description':description,'inLanguage':'es','isPartOf':{'@id':BASE+'#website'},'about':{'@id':BASE+'#application'}})
+  graph.extend([{'@type':'TechArticle','@id':url+'#guia','url':url,'headline':title,'description':description,'inLanguage':language,'isPartOf':{'@id':BASE+'#website'},'about':{'@id':home+'#application'},'articleSection':headings.items},
+  {'@type':'BreadcrumbList','itemListElement':[{'@type':'ListItem','position':1,'name':'BlendParser','item':home},{'@type':'ListItem','position':2,'name':'Documentation' if language=='en' else 'Documentación','item':url}]}])
+ else:graph.append({'@type':'WebPage','@id':url+'#webpage','url':url,'name':title,'description':description,'inLanguage':language,'isPartOf':{'@id':BASE+'#website'},'about':{'@id':home+'#application'}})
  metadata=f'''<!-- seo:start --><link rel="canonical" href="{url}"><meta name="robots" content="index, follow, max-image-preview:large"><meta name="theme-color" content="#11603f"><link rel="apple-touch-icon" href="{BASE}assets/icon.png"><meta property="og:site_name" content="BlendParser"><meta property="og:type" content="{'article' if route else 'website'}"><meta property="og:locale" content="es_MX"><meta property="og:url" content="{url}"><meta property="og:title" content="{escape(title,quote=True)}"><meta property="og:description" content="{escape(description,quote=True)}"><meta property="og:image" content="{BASE}assets/social-preview.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:type" content="image/png"><meta property="og:image:alt" content="BlendParser convierte modelos de Blender a impresión 3D multicolor"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{escape(title,quote=True)}"><meta name="twitter:description" content="{escape(description,quote=True)}"><meta name="twitter:image" content="{BASE}assets/social-preview.png"><meta name="twitter:image:alt" content="Modelo de ejemplo en BlendParser"><script type="application/ld+json">{json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False,separators=(',',':'))}</script><!-- seo:end -->'''
+ if language=='en':
+  metadata=metadata.replace('content="es_MX"','content="en_US"').replace('BlendParser convierte modelos de Blender a impresión 3D multicolor','BlendParser converts Blender models to multicolor 3D printing').replace('Modelo de ejemplo en BlendParser','Example model in BlendParser')
+ if not is_docs:metadata=metadata.replace('content="article"','content="website"')
+ counterpart='docs.html' if is_docs else ''
+ metadata+=f'<link rel="alternate" hreflang="es" href="{BASE+counterpart}"><link rel="alternate" hreflang="en" href="{BASE+"en/"+counterpart}"><link rel="alternate" hreflang="x-default" href="{BASE+counterpart}">'
+ # Alternate links are regenerated along with the SEO block.
+ s=re.sub(r'<link rel="alternate"[^>]*>','',s)
  s=s.replace('</head>',metadata+'</head>')
  # Known intrinsic sizes prevent layout shifts; only the hero is eager.
  def size_image(match):
   tag=match[0];src=re.search(r'src="([^"]+)"',tag)
   if not src:return tag
-  image=ROOT/urlsplit(src[1]).path
+  image=path.parent/urlsplit(src[1]).path
   if image.suffix.lower()=='.png' and image.exists():
    with image.open('rb') as file:header=file.read(24)
    if header[:8]==b'\x89PNG\r\n\x1a\n':
@@ -61,10 +73,10 @@ for filename,(title,description,route) in pages.items():
  s=re.sub(r'<img\b[^>]*>',size_image,s)
  def version(match):
   prefix,asset=match[1],match[2]
-  file=ROOT/asset
+  file=path.parent/asset
   digest=hashlib.sha256(file.read_bytes()).hexdigest()[:12]
   return prefix+asset+'?v='+digest+'"'
- s=re.sub(r'((?:src|href)=")((?:assets/)[^"?]+\.(?:js|css))(?:\?v=[^"]*)?"',version,s)
+ s=re.sub(r'((?:src|href)=")((?:\.\./)?assets/[^"?]+\.(?:js|css))(?:\?v=[^"]*)?"',version,s)
  path.write_text(s,encoding='utf-8')
 sitemap='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{BASE+route}</loc></url>\n' for _,_,route in pages.values())+'</urlset>\n'
 (ROOT/'sitemap.xml').write_text(sitemap,encoding='utf-8')
