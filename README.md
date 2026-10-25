@@ -56,7 +56,7 @@ Las pausas por visibilidad son temporales: el recorrido continúa al volver a la
 
 ## Documentación de uso
 
-`docs.html` se genera con `scripts/docs.py` durante el build. Sus trece secciones se contrastaron con el tag `alpha-0.0.5` y el ejecutable extraído del MSI oficial. Incluye catálogo de 87 impresoras, boquillas, impresoras propias, tamaño por ejes y en el visor, medición, placa y torre, estimación de desperdicio con parámetros ajustables e idiomas. La exportación por color está oculta en esta versión y no se anuncia como disponible. Incluye índice, búsqueda local, capturas reales, controles, atajos, límites y solución de problemas. La guía también funciona sin JavaScript.
+`docs.html` se genera con `scripts/docs.py` durante el build. Sus dieciséis secciones cubren la versión publicada 0.0.6 y las funciones próximas revisadas en `main` (`ced391d1ba014078fe777e6df3c4dd894d873770`). Importación BLEND/OBJ/FBX/glTF/GLB/PLY y recuperación de texturas, diagnóstico FDM con correcciones reversibles, y movimiento, rotación y corte se identifican como próximas: aún no están en el instalador 0.0.6. También se documentan impresoras, tamaño, medición, placa, colores, pintura, desperdicio, exportación, atajos y límites. La exportación ZIP por color sigue oculta y no se anuncia como disponible. La guía funciona sin JavaScript.
 
 ## SEO
 
@@ -66,8 +66,14 @@ El sitemap público está en `https://arnulfovargas.github.io/BlendParser/sitema
 
 Las imágenes incluyen dimensiones intrínsecas y carga diferida salvo el producto inicial. CSS y JavaScript reciben una versión de contenido para que un navegador no conserve una implementación anterior después del despliegue. La imagen social, `assets/social-preview.png`, tiene 1200 × 630 px y se creó con una captura real; su composición está en `scripts/social-preview.html`.
 
-## Capturas de la versión 0.0.5
+## Capturas HD de la próxima versión
 
-`assets/captures.json` registra la procedencia y configuración de las capturas: ejecutable del MSI oficial `alpha-0.0.5`, modelo de ejemplo a 75 mm, Bambu Lab A1 y boquilla de 0,4 mm. Se renovaron la interfaz completa, Original y Resultado; se añadieron Tamaño, Medir, Placa y torre, Ajustes del desperdicio, Mis impresoras y Preferencias. Los números visibles corresponden a ese ejemplo, no son promesas de consumo o rendimiento. Las capturas auténticas de Blender del mismo archivo se conservan.
+`assets/captures.json` registra el commit de origen, la procedencia y los ajustes de las capturas. Se compiló `main` en modo release y se capturó su WebView real, incluido el modelo WebGL: 1600 × 1000 píxeles CSS con factor de escala 2, que produce imágenes de 3200 × 2000 píxeles. Original y Resultado son recortes nativos del visor con idéntica cámara y dimensiones; no se ampliaron capturas antiguas ni se reconstruyó la interfaz.
 
-Para repetirlas, abre el ejecutable oficial con `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9223`, carga el modelo y ejecuta `node scripts/capture-app.mjs`. El script requiere `puppeteer-core`; `BP_BROWSER_TOOLS` permite reutilizar una instalación local. `BP_APP_CDP` cambia el puerto. Captura la interfaz real y aplica los ajustes del ejemplo; no reconstruye ni modifica el aspecto de la app.
+La compilación conserva la versión interna que declara el código (`v0.0.2`); las imágenes son una vista previa de desarrollo, no capturas del instalador publicado 0.0.6. La landing y las dos guías explican esta diferencia. El ejemplo usa una altura de 75 mm, Bambu Lab A1 y boquilla de 0,4 mm. Las cifras visibles corresponden al ejemplo. Las capturas auténticas de Blender se conservan en su resolución original.
+
+El script también captura WebP al 95 % desde la misma vista y con las mismas dimensiones, para las vistas previas de la web. Los enlaces de ampliación conservan los PNG originales. El generador SEO añade `srcset` cuando existe la vista WebP; el catálogo inglés ajusta su ruta bajo `/en/`.
+
+Para repetirlas, compila el commit revisado, abre el ejecutable con el modelo y `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9223 --remote-debugging-address=127.0.0.1` y ejecuta `node scripts/capture-app.mjs`. Requiere `puppeteer-core`; `BP_BROWSER_TOOLS` permite reutilizar una instalación existente y `BP_APP_CDP` cambia el puerto. `BP_CAPTURE_VERSION` valida opcionalmente la versión visible. `BP_CAPTURE_SOURCE_REF` debe indicar el commit realmente compilado.
+
+La captura del diálogo Archivos del modelo usa un OBJ exportado del mismo BLEND mediante Blender 5.0.1: los materiales sin sus texturas empaquetadas activan el flujo real de asignación. Para repetirla, abre ese OBJ en otra sesión con depuración en el puerto 9224 (y un `WEBVIEW2_USER_DATA_FOLDER` separado), elige español y ejecuta `node scripts/capture-import.mjs`; `BP_IMPORT_CDP` permite cambiar la dirección. El sitio no anuncia estos formatos como disponibles en 0.0.6. La copia local de descargas y los datos estructurados siguen apuntando a la última versión publicada con instaladores.

@@ -41,8 +41,19 @@ try {
   await page.click('[data-shot="resultado"]');
   await page.waitForFunction(()=>document.querySelector('[data-capture-image]').src.endsWith('/assets/resultado.png'));
   assert.match(await page.$eval('[data-capture-caption]',el=>el.textContent),language==='en'?/filament colors/:/colores de filamento/);
-  await page.click('[data-feature="mesh"]');
-  assert.equal(await page.$eval('#feature-mesh',el=>el.hidden),false);
+  for(const feature of ['color','mesh','import','analysis','export']){
+   await page.click(`[data-feature="${feature}"]`);
+   const panel=`#feature-${feature}`;
+   assert.equal(await page.$eval(panel,el=>el.hidden),false);
+   await page.$eval(`${panel} img`,el=>el.scrollIntoView({block:'center',behavior:'instant'}));
+   await page.waitForFunction(selector=>{const img=document.querySelector(selector);return img.complete&&img.naturalWidth>0;},{},`${panel} img`);
+   assert.match(await page.$eval(`${panel} img`,el=>el.currentSrc),/\.webp$/);
+   await page.click(`${panel} [data-lightbox]`);
+   assert.equal(await page.$eval('.image-dialog',el=>el.open),true);
+   await page.waitForFunction(()=>{const img=document.querySelector('.image-dialog img');return img.complete&&img.naturalWidth===3200;});
+   assert.match(await page.$eval('.image-dialog img',el=>el.currentSrc),/\.png$/);
+   await page.keyboard.press('Escape');
+  }
   await page.click('.faq-item summary');
   assert.equal(await page.$eval('.faq-item summary',el=>el.getAttribute('aria-expanded')),'true');
   const navAtWidth=new Map();
@@ -86,11 +97,11 @@ try {
   // Compare at the top: the docs header is sticky while the landing is static.
   await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
   assert.deepEqual(await navPositions(page),landingNav,'Landing and guide navigation must keep identical positions');
-  assert.equal(await page.$$eval('[data-doc-section]',els=>els.length),13);
+  assert.equal(await page.$$eval('[data-doc-section]',els=>els.length),16);
   await page.type('#doc-search',language==='en'?'brush':'pincel');
-  assert.match(await page.$eval('#doc-search-status',el=>el.textContent),language==='en'?/of 13 sections/:/de 13 secciones/);
+  assert.match(await page.$eval('#doc-search-status',el=>el.textContent),language==='en'?/of 16 sections/:/de 16 secciones/);
   await page.focus('#doc-search');await page.keyboard.press('Escape');
-  assert.equal(await page.$$eval('[data-doc-section]:not([hidden])',els=>els.length),13);
+  assert.equal(await page.$$eval('[data-doc-section]:not([hidden])',els=>els.length),16);
   await page.type('#doc-search','zzzznoresult');
   assert.equal(await page.$eval('.doc-empty',el=>el.hidden),false);
   await page.keyboard.press('Escape');
@@ -116,7 +127,7 @@ try {
   await page.click(`[data-language="${other}"]`);
   assert.equal(await page.$eval('html',el=>el.lang),other);
   await page.goto(localized('docs.html'),{waitUntil:'networkidle0'});
-  assert.equal(await page.$$eval('[data-doc-section]:not([hidden])',els=>els.length),13);
+  assert.equal(await page.$$eval('[data-doc-section]:not([hidden])',els=>els.length),16);
   await page.setJavaScriptEnabled(true);
  }
  await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
