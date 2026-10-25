@@ -12,6 +12,8 @@ class Page(HTMLParser):
    self.ids.add(attrs['id'])
   for key in ('href','src'):
    if attrs.get(key):self.links.append(attrs[key])
+  if attrs.get('srcset'):
+   self.links.extend(item.strip().split()[0] for item in attrs['srcset'].split(','))
 pages={path.resolve():Page(path) for path in [*ROOT.glob('*.html'),*(ROOT/'en').glob('*.html')]}
 for page in pages.values():
  for link in page.links:

@@ -33,7 +33,7 @@ class Translator(HTMLParser):
                 value = self.catalog[value]
             if tag == 'html' and key == 'lang':
                 value = 'en'
-            if value and key in ('href', 'src') and value.startswith('assets/'):
+            if value and key in ('href', 'src', 'srcset') and value.startswith('assets/'):
                 value = '../' + value
             translated.append(key if value is None else f'{key}="{escape(value, quote=True)}"')
         self.output.append('<' + tag + (' ' if translated else '') + ' '.join(translated) + '>')

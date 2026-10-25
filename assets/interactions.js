@@ -19,6 +19,7 @@ for(const group of document.querySelectorAll('[data-capture-switch]')) {
    if(!unchanged&&document.body.classList.contains('four')&&!reduceMotion.matches){
     old=image.cloneNode();old.removeAttribute('data-capture-image');old.alt='';old.setAttribute('aria-hidden','true');old.classList.add('outgoing-capture');image.parentElement.append(old);
    }
+   image.removeAttribute('srcset');
    image.src=next.src;image.alt=b.dataset.caption;
    image.closest('a').href=next.src;
    caption.textContent=b.dataset.caption;
@@ -58,6 +59,7 @@ let trigger=null;
 for(const link of document.querySelectorAll('[data-lightbox]'))link.addEventListener('click',event=>{
  if(event.ctrlKey||event.metaKey||event.shiftKey||!dialog)return;
  event.preventDefault();trigger=link;
+ dialog.querySelector('img').removeAttribute('srcset');
  dialog.querySelector('img').src=link.href;
  dialog.querySelector('img').alt=link.querySelector('img').alt;
  dialog.querySelector('p').textContent=link.closest('figure')?.querySelector('figcaption')?.textContent||link.querySelector('img').alt;

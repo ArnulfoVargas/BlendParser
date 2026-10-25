@@ -1,13 +1,20 @@
 {
-  "release": "alpha-0.0.5",
-  "source": "Published Windows MSI, extracted without installation; real Tauri WebView screenshots",
+  "source_ref": "ced391d1ba014078fe777e6df3c4dd894d873770",
+  "source": "Local release-profile build of the reviewed main commit; real Tauri WebView screenshots",
+  "availability": "Development preview; new features are not included in the published alpha-0.0.6 installer",
+  "displayed_version": "v0.0.2",
   "model": "spider_hito2v5_optimizada-3d-texturizado-v21.blend",
   "height_mm": 75,
   "printer": "Bambu Lab A1",
   "nozzle_mm": 0.4,
-  "viewport": [
+  "viewport_css": [
     1600,
     1000
+  ],
+  "device_scale_factor": 2,
+  "full_capture_pixels": [
+    3200,
+    2000
   ],
   "language": "es",
   "captures": [
@@ -16,10 +23,16 @@
     "original.png",
     "tamano.png",
     "medir.png",
+    "mover.png",
+    "rotar.png",
+    "corte.png",
+    "viabilidad.png",
     "placa-torre.png",
     "desperdicio.png",
     "impresoras.png",
-    "preferencias.png"
+    "preferencias.png",
+    "importacion.png"
   ],
-  "blender_captures": "Existing real Blender 5.0 screenshots of the same source model retained"
+  "blender_captures": "Existing authentic Blender 5.0 images of the same model retained at native resolution",
+  "import_example": "reference.obj exported from the same source BLEND with Blender 5.0.1; the real importer prompts to restore packed textures"
 }

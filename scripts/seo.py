@@ -18,9 +18,9 @@ class Headings(HTMLParser):
   if self.active:self.parts.append(data.strip())
 pages={
  'index.html':('BlendParser: convierte Blender a 3MF multicolor','Convierte modelos de Blender en 3MF multicolor para Bambu Studio. Ajusta colores, pinta en 3D y descarga BlendParser para Windows o Linux.',''),
- 'docs.html':('Guía de BlendParser: colores, pincel y exportación 3MF','Aprende a usar BlendParser: importar modelos de Blender, preparar colores y malla, pintar, exportar a Bambu Studio y resolver problemas.','docs.html'),
+ 'docs.html':('Guía de BlendParser: importación, diagnóstico FDM y 3MF','Aprende a usar BlendParser: colores, tamaño, desperdicio y exportación 3MF. Consulta también las próximas herramientas de importación, diagnóstico FDM y corte.','docs.html'),
  'en/index.html':('BlendParser: convert Blender to multicolor 3MF','Convert Blender models to multicolor 3MF for Bambu Studio. Adjust colors, paint in 3D and download BlendParser for Windows or Linux.','en/'),
- 'en/docs.html':('BlendParser guide: colors, brush and 3MF export','Learn to use BlendParser: import Blender models, prepare colors and meshes, paint, export to Bambu Studio and troubleshoot common issues.','en/docs.html')
+ 'en/docs.html':('BlendParser guide: imports, FDM diagnosis and 3MF','Learn to use BlendParser: colors, dimensions, waste and 3MF export. Explore upcoming import tools, FDM diagnosis, model positioning, rotation and cutting.','en/docs.html')
 }
 for filename,(title,description,route) in pages.items():
  path=ROOT/filename;s=path.read_text(encoding='utf-8');url=BASE+route
@@ -63,6 +63,11 @@ for filename,(title,description,route) in pages.items():
   if not src:return tag
   if 'decoding=' not in tag:tag=tag[:-1]+' decoding="async">'
   image=path.parent/urlsplit(src[1]).path
+  # Native-resolution WebP previews keep the site light; links retain the HD PNG.
+  preview=image.with_suffix('.webp')
+  if image.suffix.lower()=='.png' and preview.exists():
+   tag=re.sub(r'\s+srcset="[^"]*"','',tag)
+   tag=tag[:-1]+f' srcset="{src[1][:-4]}.webp">'
   if image.suffix.lower()=='.png' and image.exists():
    with image.open('rb') as file:header=file.read(24)
    if header[:8]==b'\x89PNG\r\n\x1a\n':
