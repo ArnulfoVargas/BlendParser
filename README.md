@@ -1,5 +1,7 @@
 # BlendParser
 
+**Sitio público:** https://arnulfovargas.github.io/BlendParser/
+
 Landing oficial de BlendParser. La aplicación y sus releases viven en [ArnulfoVargas/blend-parser-app](https://github.com/ArnulfoVargas/blend-parser-app).
 
 Sitio estático sin dependencias de producción. HTML, CSS, JavaScript y fuentes locales. Las capturas son reales, tomadas en Blender y BlendParser con el mismo modelo.
