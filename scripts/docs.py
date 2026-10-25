@@ -1,5 +1,6 @@
 """User guide checked against app release alpha-0.0.2, not local pending edits."""
 from pathlib import Path
+import re
 ROOT=Path(__file__).resolve().parent.parent
 sections=[]
 def section(key,title,body):sections.append((key,title,body))
@@ -23,7 +24,9 @@ html=f'''<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="
 index=ROOT/'index.html'
 s=index.read_text(encoding='utf-8')
 s=s.replace('<a class="minor" href="#preguntas">¿Es para mí?</a>','<a class="doc-link" href="docs.html">Documentación</a>')
-s=s.replace('<a href="https://github.com/ArnulfoVargas/blend-parser-app/blob/main/LICENSE">Licencia MIT</a>','<a href="docs.html">Documentación</a><a href="https://github.com/ArnulfoVargas/blend-parser-app/blob/main/LICENSE">Licencia MIT</a>')
+s=re.sub(r'(?:<a href="docs.html">Documentación</a>)+','<a href="docs.html">Documentación</a>',s)
+if '<a href="docs.html">Documentación</a>' not in s:
+ s=s.replace('<a href="https://github.com/ArnulfoVargas/blend-parser-app/blob/main/LICENSE">Licencia MIT</a>','<a href="docs.html">Documentación</a><a href="https://github.com/ArnulfoVargas/blend-parser-app/blob/main/LICENSE">Licencia MIT</a>')
 s=s.replace('href="https://github.com/ArnulfoVargas/blend-parser-app#readme">Leer las instrucciones','href="docs.html#empezar">Leer las instrucciones')
 s=s.replace('<a href="04-tu-proxima-pieza.html">04 Tu próxima pieza</a>','')
 index.write_text(s,encoding='utf-8')
