@@ -56,7 +56,7 @@ Las pausas por visibilidad son temporales: el recorrido continúa al volver a la
 
 ## Documentación de uso
 
-`docs.html` se genera con `scripts/docs.py` durante el build. Sus doce secciones se contrastaron con la interfaz y el código del tag `alpha-0.0.2`, incluido el exportador ZIP publicado. La guía distingue esa versión del kit de armado en desarrollo. Incluye índice, búsqueda local, capturas reales, controles, atajos, límites y solución de problemas. La guía también funciona sin JavaScript.
+`docs.html` se genera con `scripts/docs.py` durante el build. Sus trece secciones se contrastaron con el tag `alpha-0.0.5` y el ejecutable extraído del MSI oficial. Incluye catálogo de 87 impresoras, boquillas, impresoras propias, tamaño por ejes y en el visor, medición, placa y torre, estimación de desperdicio con parámetros ajustables e idiomas. La exportación por color está oculta en esta versión y no se anuncia como disponible. Incluye índice, búsqueda local, capturas reales, controles, atajos, límites y solución de problemas. La guía también funciona sin JavaScript.
 
 ## SEO
 
@@ -65,3 +65,9 @@ Las pausas por visibilidad son temporales: el recorrido continúa al volver a la
 El sitemap público está en `https://arnulfovargas.github.io/BlendParser/sitemap.xml`. Puede enviarse a Search Console al verificar la propiedad. Esta web es un sitio de proyecto bajo `/BlendParser/`; no controla el `robots.txt` raíz de `arnulfovargas.github.io`, por lo que usa meta robots y un sitemap propio en lugar de un robots de subcarpeta ineficaz.
 
 Las imágenes incluyen dimensiones intrínsecas y carga diferida salvo el producto inicial. CSS y JavaScript reciben una versión de contenido para que un navegador no conserve una implementación anterior después del despliegue. La imagen social, `assets/social-preview.png`, tiene 1200 × 630 px y se creó con una captura real; su composición está en `scripts/social-preview.html`.
+
+## Capturas de la versión 0.0.5
+
+`assets/captures.json` registra la procedencia y configuración de las capturas: ejecutable del MSI oficial `alpha-0.0.5`, modelo de ejemplo a 75 mm, Bambu Lab A1 y boquilla de 0,4 mm. Se renovaron la interfaz completa, Original y Resultado; se añadieron Tamaño, Medir, Placa y torre, Ajustes del desperdicio, Mis impresoras y Preferencias. Los números visibles corresponden a ese ejemplo, no son promesas de consumo o rendimiento. Las capturas auténticas de Blender del mismo archivo se conservan.
+
+Para repetirlas, abre el ejecutable oficial con `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9223`, carga el modelo y ejecuta `node scripts/capture-app.mjs`. El script requiere `puppeteer-core`; `BP_BROWSER_TOOLS` permite reutilizar una instalación local. `BP_APP_CDP` cambia el puerto. Captura la interfaz real y aplica los ajustes del ejemplo; no reconstruye ni modifica el aspecto de la app.

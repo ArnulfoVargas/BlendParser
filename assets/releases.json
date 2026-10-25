@@ -1,35 +1,35 @@
 {
-  "checked_at": "2026-10-25T03:57:54.616770+00:00",
+  "checked_at": "2026-10-25T09:39:56.064894+00:00",
   "release": {
-    "tag_name": "alpha-0.0.2",
-    "published_at": "2026-10-25T03:26:54Z",
+    "tag_name": "alpha-0.0.5",
+    "published_at": "2026-10-25T09:36:01Z",
     "prerelease": false,
-    "html_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/tag/alpha-0.0.2",
+    "html_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/tag/alpha-0.0.5",
     "assets": [
       {
-        "name": "BlendParser-0.0.2-1.x86_64.rpm",
-        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.2/BlendParser-0.0.2-1.x86_64.rpm",
-        "size": 4993593
+        "name": "BlendParser-0.0.5-1.x86_64.rpm",
+        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.5/BlendParser-0.0.5-1.x86_64.rpm",
+        "size": 5195335
       },
       {
-        "name": "BlendParser_0.0.2_amd64.AppImage",
-        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.2/BlendParser_0.0.2_amd64.AppImage",
-        "size": 83294712
+        "name": "BlendParser_0.0.5_amd64.AppImage",
+        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.5/BlendParser_0.0.5_amd64.AppImage",
+        "size": 83454456
       },
       {
-        "name": "BlendParser_0.0.2_amd64.deb",
-        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.2/BlendParser_0.0.2_amd64.deb",
-        "size": 4988918
+        "name": "BlendParser_0.0.5_amd64.deb",
+        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.5/BlendParser_0.0.5_amd64.deb",
+        "size": 5190358
       },
       {
-        "name": "BlendParser_0.0.2_x64-setup.exe",
-        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.2/BlendParser_0.0.2_x64-setup.exe",
-        "size": 3756227
+        "name": "BlendParser_0.0.5_x64-setup.exe",
+        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.5/BlendParser_0.0.5_x64-setup.exe",
+        "size": 3913856
       },
       {
-        "name": "BlendParser_0.0.2_x64_en-US.msi",
-        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.2/BlendParser_0.0.2_x64_en-US.msi",
-        "size": 5197824
+        "name": "BlendParser_0.0.5_x64_en-US.msi",
+        "browser_download_url": "https://github.com/ArnulfoVargas/blend-parser-app/releases/download/alpha-0.0.5/BlendParser_0.0.5_x64_en-US.msi",
+        "size": 5406720
       }
     ]
   }

@@ -61,13 +61,13 @@ for filename,(title,description,route) in pages.items():
  def size_image(match):
   tag=match[0];src=re.search(r'src="([^"]+)"',tag)
   if not src:return tag
+  if 'decoding=' not in tag:tag=tag[:-1]+' decoding="async">'
   image=path.parent/urlsplit(src[1]).path
   if image.suffix.lower()=='.png' and image.exists():
    with image.open('rb') as file:header=file.read(24)
    if header[:8]==b'\x89PNG\r\n\x1a\n':
     width,height=struct.unpack('>II',header[16:24]);tag=re.sub(r'\s(?:width|height)="[^"]*"','',tag)
     tag=tag[:-1]+f' width="{width}" height="{height}">'
-  if 'decoding=' not in tag:tag=tag[:-1]+' decoding="async">'
   if 'loading=' not in tag and 'fetchpriority=' not in tag and 'assets/icon' not in tag:tag=tag[:-1]+' loading="lazy">'
   return tag
  s=re.sub(r'<img\b[^>]*>',size_image,s)
