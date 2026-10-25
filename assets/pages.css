@@ -429,8 +429,6 @@ html[lang='en'] .four .friendly-hero h1 { font-size:clamp(32px,17.5cqi,106px); m
 .feature-controls button:hover { background:var(--color-paper-3); }
 .feature-controls button:active { transform:translateY(1px); }
 .feature-controls button:disabled { opacity:.5; cursor:not-allowed; }
-.feature-preview { max-width:80ch; margin:0 0 var(--space-xl); padding:var(--space-md) var(--space-lg); background:var(--color-mint); border-left:3px solid var(--color-accent); border-radius:var(--radius-input); color:var(--color-ink-2); font-size:16px; line-height:1.6; }
-.feature-preview strong { color:var(--color-ink); }
 .feature-panel { border-top:var(--rule); padding-top:var(--space-xl); }
 .feature-panel[hidden] { display:none; }
 .feature-panel h3 { font-size:32px; }
