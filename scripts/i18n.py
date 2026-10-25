@@ -67,11 +67,25 @@ def switcher(filename, language):
     spanish = '../' + ('docs.html' if is_docs else '') if language == 'en' else ('docs.html' if is_docs else './')
     english = ('docs.html' if is_docs else './') if language == 'en' else 'en/' + ('docs.html' if is_docs else '')
     label = 'Language' if language == 'en' else 'Idioma'
-    return (f'<!-- language:start --><div class="language-switch" role="group" aria-label="{label}">'
+    name = 'English' if language == 'en' else 'Español'
+    return (f'<!-- language:start --><details class="language-switch"><summary aria-label="{label}: {name}">'
+            f'<span class="language-name">{name}</span><span class="language-code">{language.upper()}</span><span aria-hidden="true">⌄</span></summary><div class="language-options">'
             f'<a href="{spanish}" lang="es" hreflang="es" data-language="es"'
             + (' aria-current="true"' if language == 'es' else '') + '>Español</a>'
             f'<a href="{english}" lang="en" hreflang="en" data-language="en"'
-            + (' aria-current="true"' if language == 'en' else '') + '>English</a></div><!-- language:end -->')
+            + (' aria-current="true"' if language == 'en' else '') + '>English</a></div></details><!-- language:end -->')
+
+
+def navigation(filename, language):
+    is_docs = filename == 'docs.html'
+    labels = ['Inicio', 'Cómo funciona', 'Herramientas', 'Documentación', 'Descargar'] if language == 'es' else ['Home', 'How it works', 'Tools', 'Documentation', 'Download']
+    current = ' aria-current="page"'
+    return ('<div class="navlinks">' + switcher(filename, language)
+            + f'<a class="home-link" href="./"{current if not is_docs else ""}>{labels[0]}</a>'
+            + f'<a class="minor" href="{"./" if is_docs else ""}#recorrido">{labels[1]}</a>'
+            + f'<a class="minor" href="{"./" if is_docs else ""}#herramientas">{labels[2]}</a>'
+            + f'<a class="doc-link" href="docs.html"{current if is_docs else ""}>{labels[3]}</a>'
+            + f'<a class="nav-action" data-download href="https://github.com/ArnulfoVargas/blend-parser-app/releases">{labels[4]}</a></div>')
 
 
 def build():
@@ -89,7 +103,7 @@ def build():
         for language, content, target, prefix in (
             ('es', source, path, ''), ('en', english, ROOT / 'en' / filename, '../')
         ):
-            content = content.replace('</nav>', switcher(filename, language) + '</nav>', 1)
+            content = re.sub(r'<div class="navlinks">.*?</div>', navigation(filename, language), content, count=1, flags=re.S)
             content = content.replace('</body>', f'<script src="{prefix}assets/language.js" defer></script></body>')
             target.write_text(content, encoding='utf-8')
     print('Spanish and English pages generated; all English strings checked against the catalog.')

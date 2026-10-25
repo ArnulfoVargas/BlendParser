@@ -79,5 +79,5 @@ for filename,(title,description,route) in pages.items():
  s=re.sub(r'((?:src|href)=")((?:\.\./)?assets/[^"?]+\.(?:js|css))(?:\?v=[^"]*)?"',version,s)
  path.write_text(s,encoding='utf-8')
 sitemap='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'  <url><loc>{BASE+route}</loc></url>\n' for _,_,route in pages.values())+'</urlset>\n'
-(ROOT/'sitemap.xml').write_text(sitemap,encoding='utf-8')
+(ROOT/'sitemap.xml').write_text(sitemap,encoding='utf-8',newline='\n')
 print('SEO metadata, structured data, sitemap, image sizes and asset versions generated.')

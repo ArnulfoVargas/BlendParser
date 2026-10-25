@@ -1,7 +1,6 @@
 import {loadRelease} from './releases.js';
 loadRelease();
 const index=document.querySelector('.doc-index');
-if(matchMedia('(max-width:700px)').matches)index.open=false;
 const search=document.querySelector('#doc-search');
 const sections=[...document.querySelectorAll('[data-doc-section]')];
 const links=[...index.querySelectorAll('a')];

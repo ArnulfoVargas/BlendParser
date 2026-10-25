@@ -8,6 +8,10 @@ const puppeteer=require('puppeteer-core');
 const browser=await puppeteer.launch({executablePath:process.env.BP_CHROME||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
 const base=process.env.BP_SITE_URL||'http://127.0.0.1:8768/';
 const snapshot=JSON.parse(readFileSync(new URL('../assets/releases.json',import.meta.url)));
+const navPositions=page=>page.$$eval('nav.container .navlinks > *',elements=>elements.map(el=>{
+ const {x,y,width,height}=el.getBoundingClientRect();
+ return {x,y:height?y-el.closest('nav').getBoundingClientRect().top:0,width,height};
+}));
 mkdirSync('.qa',{recursive:true});
 try {
  const page=await browser.newPage();const errors=[];
@@ -21,9 +25,16 @@ try {
   await page.setViewport({width:1440,height:900});
   await page.goto(base+prefix,{waitUntil:'networkidle0'});
   assert.equal(await page.$eval('html',el=>el.lang),language);
-  assert.match(await page.$eval('[data-download]',el=>el.textContent),language==='en'?/Download for Windows/:/Descargar para Windows/);
+  assert.match(await page.$eval('[data-download]:not(.nav-action)',el=>el.textContent),language==='en'?/Download for Windows/:/Descargar para Windows/);
+  assert.equal(await page.$eval('.nav-action',el=>el.textContent),language==='en'?'Download':'Descargar');
   assert.ok(await page.$$eval('[data-release-assets] a',els=>els.length>=2));
   assert.ok((await page.$eval('[data-release-status]',el=>el.textContent)).includes(snapshot.release.tag_name));
+  const landingNav=await navPositions(page);
+  const navBeforeDropdown=await navPositions(page);
+  await page.click('.language-switch summary');
+  assert.deepEqual(await navPositions(page),navBeforeDropdown,'Opening language dropdown must not change layout');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.$eval('.language-switch',el=>el.open),false);
   await page.click('[data-play-tour]');
   assert.equal(await page.$eval('[data-play-tour]',el=>el.textContent),language==='en'?'Play tour':'Reproducir recorrido');
   await page.click('[data-shot="resultado"]');
@@ -33,16 +44,31 @@ try {
   assert.equal(await page.$eval('#feature-mesh',el=>el.hidden),false);
   await page.click('.faq-item summary');
   assert.equal(await page.$eval('.faq-item summary',el=>el.getAttribute('aria-expanded')),'true');
+  const navAtWidth=new Map();
   for(const width of [375,768,1024,1280,1440]){
    await page.setViewport({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${prefix} overflow at ${width}`);
    assert.equal(await page.$eval('.language-switch',el=>el.getBoundingClientRect().right>innerWidth),false);
+   navAtWidth.set(width,await navPositions(page));
+  }
+  // Keep the accordion trigger and viewport still while its answer expands.
+  await page.evaluate(()=>{const s=document.querySelector('.faq-item summary');scrollTo({top:scrollY+s.getBoundingClientRect().top-100,behavior:'instant'});});
+  if(await page.$eval('.faq-item',el=>el.open)){await page.click('.faq-item summary');await new Promise(r=>setTimeout(r,400));}
+  const before=await page.evaluate(()=>scrollY);
+  await page.click('.faq-item summary');
+  for(let frame=0;frame<25;frame++){
+   await new Promise(r=>setTimeout(r,20));
+   assert.ok(Math.abs(await page.evaluate(()=>scrollY)-before)<=1,'FAQ must not move the viewport');
   }
   await page.setViewport({width:375,height:812});
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
   await page.screenshot({path:`.qa/${language}-landing-mobile.png`,fullPage:true});
   await page.screenshot({path:`.qa/${language}-landing-mobile-top.png`});
   await page.setViewport({width:1440,height:900});
   await page.goto(base+prefix+'docs.html#paleta',{waitUntil:'networkidle0'});
+  // Compare at the top: the docs header is sticky while the landing is static.
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+  assert.deepEqual(await navPositions(page),landingNav,'Landing and guide navigation must keep identical positions');
   assert.equal(await page.$$eval('[data-doc-section]',els=>els.length),12);
   await page.type('#doc-search',language==='en'?'brush':'pincel');
   assert.match(await page.$eval('#doc-search-status',el=>el.textContent),language==='en'?/of 12 sections/:/de 12 secciones/);
@@ -52,6 +78,7 @@ try {
   assert.equal(await page.$eval('.doc-empty',el=>el.hidden),false);
   await page.keyboard.press('Escape');
   const other=language==='en'?'es':'en';
+  await page.click('.language-switch summary');
   await page.click(`[data-language="${other}"]`);
   await page.waitForFunction(expected=>document.documentElement.lang===expected,{},other);
   assert.equal(new URL(page.url()).hash,'#paleta');
@@ -60,6 +87,7 @@ try {
   for(const width of [375,768,1440]){
    await page.setViewport({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${prefix}docs overflow at ${width}`);
+   assert.deepEqual(await navPositions(page),navAtWidth.get(width),`Navigation must remain stable at ${width}px`);
   }
   await page.setViewport({width:375,height:812});
   await page.screenshot({path:`.qa/${language}-docs-mobile.png`,fullPage:true});
@@ -67,6 +95,7 @@ try {
   await page.setJavaScriptEnabled(false);
   await page.goto(base+prefix,{waitUntil:'networkidle0'});
   assert.equal(await page.$eval('[data-download]',el=>el.href),'https://github.com/ArnulfoVargas/blend-parser-app/releases');
+  await page.click('.language-switch summary');
   await page.click(`[data-language="${other}"]`);
   assert.equal(await page.$eval('html',el=>el.lang),other);
   await page.goto(base+prefix+'docs.html',{waitUntil:'networkidle0'});

@@ -21,7 +21,7 @@ function render(release){
  const platform=platformName(),preferred=preferredAsset(release,platform);
  for(const link of document.querySelectorAll('[data-download]')){
   link.href=preferred?.browser_download_url||(release.html_url?.startsWith(`https://github.com/${REPO}/releases/tag/`)?release.html_url:FALLBACK);
-  link.textContent=preferred?`${messages().download} ${platform==='windows'?'Windows':'Linux'}`:messages().downloads;
+  if(!link.classList.contains('nav-action'))link.textContent=preferred?`${messages().download} ${platform==='windows'?'Windows':'Linux'}`:messages().downloads;
  }
  const status=document.querySelector('[data-release-status]');
  if(status)status.textContent=`${release.tag_name}${release.prerelease?' · '+messages().preview:''}`;

@@ -5,3 +5,8 @@ for (const link of document.querySelectorAll('[data-language]')) {
  update();
  addEventListener('hashchange', update);
 }
+const menu=document.querySelector('.language-switch');
+document.addEventListener('click',event=>{if(menu&&!menu.contains(event.target))menu.open=false;});
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&menu?.open){menu.open=false;menu.querySelector('summary').focus();}
+});
