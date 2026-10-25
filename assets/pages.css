@@ -449,3 +449,16 @@ html { caret-color:var(--color-accent); }
  .installer-link { justify-content:center; }
 }
 @media(prefers-reduced-motion:reduce) { .faq-list .faq-item,.faq-ready .faq-answer,.faq-symbol::before,.faq-symbol::after { transition:none; } }
+
+.navlinks a:not(.nav-action) { border-radius:var(--radius-input); padding:var(--space-sm) var(--space-sm); margin-inline:calc(var(--space-sm) * -1); transition:background-color var(--dur-short) var(--ease-out),color var(--dur-short) var(--ease-out); }
+.navlinks a:not(.nav-action):hover,.navlinks a:not(.nav-action):focus-visible { background:var(--color-paper-3); color:var(--color-accent-deep); text-decoration:underline; text-underline-offset:5px; }
+.navlinks .nav-action { transition:background-color var(--dur-short) var(--ease-out),box-shadow var(--dur-short) var(--ease-out),transform var(--dur-micro) var(--ease-out); }
+.four .navlinks .nav-action:hover,.docs-page .navlinks .nav-action:hover { background:var(--color-accent-deep); color:var(--color-accent-ink); box-shadow:0 3px 0 var(--color-accent); text-decoration:none; }
+.navlinks .nav-action:active { transform:translateY(2px); box-shadow:none; }
+.navlinks a[aria-current='page'] { color:var(--color-accent-deep); background:var(--color-paper-3); }
+@media(max-width:1000px) { .navlinks .minor { display:none; } }
+@media(max-width:700px) {
+ .four nav,.docs-page > header > nav { flex-wrap:wrap; padding-block:var(--space-md); row-gap:var(--space-sm); }
+ .four nav .navlinks,.docs-page > header > nav .navlinks { width:100%; justify-content:space-between; }
+}
+@media(prefers-reduced-motion:reduce) { .navlinks a,.navlinks .nav-action { transition:none; } }

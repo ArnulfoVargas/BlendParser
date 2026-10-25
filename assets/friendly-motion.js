@@ -4,7 +4,7 @@ const dock=document.querySelector('.download-dock');
 const tour=document.querySelector('[data-tour]');
 const play=tour?.querySelector('[data-play-tour]');
 const tabs=[...(tour?.querySelectorAll('[data-shot]')||[])];
-let timer=null,playing=false,tourVisible=true;
+let timer=null,playing=false,tourVisible=true,autoStarted=false;
 const stop=()=>{
  playing=false;clearTimeout(timer);timer=null;
  if(play){play.textContent='Reproducir recorrido';play.setAttribute('aria-pressed','false');}
@@ -15,19 +15,24 @@ const advance=()=>{
  tabs[(current+1)%tabs.length].click();
  timer=setTimeout(advance,3000);
 };
-play?.addEventListener('click',()=>{
- if(playing){stop();return;}
+const start=()=>{
+ if(playing||!play)return;
  playing=true;play.textContent='Pausar recorrido';play.setAttribute('aria-pressed','true');
  tabs[0]?.click();
  if(!tour.matches(':hover'))timer=setTimeout(advance,3000);
-});
+};
+play?.addEventListener('click',()=>{autoStarted=true;if(playing)stop();else start();});
 // Automatic playback pauses while the visitor handles a capture or leaves it.
 tour?.addEventListener('pointerenter',()=>{if(playing)clearTimeout(timer);});
 tour?.addEventListener('pointerleave',()=>{if(playing&&(!tour.contains(document.activeElement)||document.activeElement===play)){clearTimeout(timer);timer=setTimeout(advance,3000);}});
 tour?.addEventListener('focusin',event=>{if(event.target!==play&&playing)clearTimeout(timer);});
 tour?.addEventListener('focusout',()=>{if(playing){clearTimeout(timer);timer=setTimeout(advance,3000);}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
-if(tour)new IntersectionObserver(entries=>{tourVisible=entries[0].isIntersecting;if(!tourVisible)stop();},{threshold:.1}).observe(tour);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else if(tourVisible&&!autoStarted&&motionAllowed.matches){autoStarted=true;start();}});
+if(tour)new IntersectionObserver(entries=>{
+ tourVisible=entries[0].isIntersecting;
+ if(!tourVisible)stop();
+ else if(!autoStarted&&motionAllowed.matches&&!document.hidden){autoStarted=true;start();}
+},{threshold:.1}).observe(tour);
 if(hero&&dock)new IntersectionObserver(entries=>{
  const show=!entries[0].isIntersecting&&entries[0].boundingClientRect.bottom<0;
  dock.hidden=!show;

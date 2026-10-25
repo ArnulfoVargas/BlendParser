@@ -32,3 +32,9 @@ Los botones descargan la app; no actualizan una instalación existente. Blender 
 ## Interacción y acceso
 
 El visor admite ratón y teclado. Las preguntas tienen una sola respuesta activa, apertura y cierre animados y controles accesibles. Las animaciones respetan movimiento reducido; el contenido sigue disponible sin JavaScript.
+
+El recorrido del inicio se reproduce automáticamente cuando el visor entra en pantalla. Se puede pausar; también se detiene fuera de pantalla o al cambiar de pestaña, y pausa al interactuar con ratón o teclado. Con movimiento reducido no arranca automáticamente.
+
+## Documentación de uso
+
+`docs.html` se genera con `scripts/docs.py` durante el build. Sus doce secciones se contrastaron con la interfaz y el código del tag `alpha-0.0.2`, incluido el exportador ZIP publicado. La guía distingue esa versión del kit de armado en desarrollo. Incluye índice, búsqueda local, capturas reales, controles, atajos, límites y solución de problemas. La guía también funciona sin JavaScript.
