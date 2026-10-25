@@ -22,8 +22,9 @@ try {
  page.on('request',request=>request.url().startsWith('https://api.github.com/')?request.abort():request.continue());
  for(const language of ['es','en']){
   const prefix=language==='en'?'en/':'';
+  const localized=route=>{const url=new URL(base+prefix+route);url.searchParams.set('lang',language);return url.href;};
   await page.setViewport({width:1440,height:900});
-  await page.goto(base+prefix,{waitUntil:'networkidle0'});
+  await page.goto(localized(''),{waitUntil:'networkidle0'});
   assert.equal(await page.$eval('html',el=>el.lang),language);
   assert.match(await page.$eval('[data-download]:not(.nav-action)',el=>el.textContent),language==='en'?/Download for Windows/:/Descargar para Windows/);
   assert.equal(await page.$eval('.nav-action',el=>el.textContent),language==='en'?'Download':'Descargar');
@@ -56,6 +57,9 @@ try {
    });
    assert.ok(menuFits,`Language menu must fit viewport at ${width}px`);
    if(language==='en'){
+    const titleSize=await page.$eval('.friendly-hero h1',heading=>parseFloat(getComputedStyle(heading).fontSize));
+    if(width===375)assert.ok(titleSize>=52,'English mobile title should keep its visual weight');
+    if(width===1440)assert.ok(titleSize>=80,'English desktop title should keep its visual weight');
     assert.ok(await page.$eval('.friendly-hero h1',heading=>[...heading.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim()).every(node=>{
      const range=document.createRange();range.selectNodeContents(node);
      return range.getClientRects().length===1&&range.getBoundingClientRect().width<=heading.clientWidth+1;
@@ -77,7 +81,8 @@ try {
   await page.screenshot({path:`.qa/${language}-landing-mobile.png`,fullPage:true});
   await page.screenshot({path:`.qa/${language}-landing-mobile-top.png`});
   await page.setViewport({width:1440,height:900});
-  await page.goto(base+prefix+'docs.html#paleta',{waitUntil:'networkidle0'});
+  await page.screenshot({path:`.qa/${language}-landing-desktop.png`});
+  await page.goto(localized('docs.html#paleta'),{waitUntil:'networkidle0'});
   // Compare at the top: the docs header is sticky while the landing is static.
   await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
   assert.deepEqual(await navPositions(page),landingNav,'Landing and guide navigation must keep identical positions');
@@ -95,7 +100,7 @@ try {
   await page.waitForFunction(expected=>document.documentElement.lang===expected,{},other);
   assert.equal(new URL(page.url()).hash,'#paleta');
   assert.equal(await page.$eval('.language-switch [aria-current="true"]',el=>el.lang),other);
-  await page.goto(base+prefix+'docs.html',{waitUntil:'networkidle0'});
+  await page.goto(localized('docs.html'),{waitUntil:'networkidle0'});
   for(const width of [375,768,1440]){
    await page.setViewport({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${prefix}docs overflow at ${width}`);
@@ -105,12 +110,12 @@ try {
   await page.screenshot({path:`.qa/${language}-docs-mobile.png`,fullPage:true});
   await page.screenshot({path:`.qa/${language}-docs-mobile-top.png`});
   await page.setJavaScriptEnabled(false);
-  await page.goto(base+prefix,{waitUntil:'networkidle0'});
+  await page.goto(localized(''),{waitUntil:'networkidle0'});
   assert.equal(await page.$eval('[data-download]',el=>el.href),'https://github.com/ArnulfoVargas/blend-parser-app/releases');
   await page.click('.language-switch summary');
   await page.click(`[data-language="${other}"]`);
   assert.equal(await page.$eval('html',el=>el.lang),other);
-  await page.goto(base+prefix+'docs.html',{waitUntil:'networkidle0'});
+  await page.goto(localized('docs.html'),{waitUntil:'networkidle0'});
   assert.equal(await page.$$eval('[data-doc-section]:not([hidden])',els=>els.length),12);
   await page.setJavaScriptEnabled(true);
  }
@@ -118,6 +123,36 @@ try {
  await page.goto(base+'en/',{waitUntil:'networkidle0'});
  assert.equal(await page.$eval('[data-play-tour]',el=>el.textContent),'Play tour');
  assert.equal(await page.evaluate(()=>document.getAnimations().filter(a=>a.playState==='running').length),0);
+ // Real navigation: detection, manual override, future visits and blocked storage.
+ const context=await browser.createBrowserContext();
+ const auto=await context.newPage();auto.on('pageerror',error=>errors.push(error.message));
+ await auto.evaluateOnNewDocument(()=>{
+  Object.defineProperty(navigator,'languages',{get:()=>['fr-FR','en-GB','es-MX']});
+  Object.defineProperty(navigator,'language',{get:()=> 'en-GB'});
+ });
+ await auto.goto(base+'docs.html?source=test#paleta',{waitUntil:'networkidle0'});
+ await auto.waitForFunction(()=>document.documentElement.lang==='en');
+ assert.equal(new URL(auto.url()).pathname,new URL(base+'en/docs.html').pathname);
+ assert.equal(new URL(auto.url()).searchParams.get('source'),'test');
+ assert.equal(new URL(auto.url()).hash,'#paleta');
+ await auto.click('.language-switch summary');await auto.click('[data-language="es"]');
+ await auto.waitForFunction(()=>document.documentElement.lang==='es');
+ await auto.goto(base,{waitUntil:'networkidle0'});
+ assert.equal(await auto.$eval('html',el=>el.lang),'es','Manual Spanish choice must override English browser on future visits');
+ await auto.goto(base+'en/',{waitUntil:'networkidle0'});
+ assert.equal(await auto.$eval('html',el=>el.lang),'en','Explicit English URL must remain shareable');
+ await context.close();
+ const blocked=await browser.newPage();blocked.on('pageerror',error=>errors.push(error.message));
+ await blocked.evaluateOnNewDocument(()=>{
+  Object.defineProperty(navigator,'languages',{get:()=>['en-US']});
+  Object.defineProperty(window,'localStorage',{get:()=>{throw new Error('Storage blocked');}});
+ });
+ await blocked.goto(base+'?lang=es',{waitUntil:'networkidle0'});
+ assert.equal(await blocked.$eval('html',el=>el.lang),'es');
+ await blocked.click('.doc-link');
+ await blocked.waitForSelector('[data-doc-section]');
+ assert.equal(await blocked.$eval('html',el=>el.lang),'es','Manual choice must survive navigation with storage blocked');
+ await blocked.close();
  assert.deepEqual(errors,[]);
- console.log('Browser i18n checks passed: both languages, mobile/desktop, downloads with API offline, tour images and labels, guide search, anchor-preserving switch, no JavaScript, reduced motion.');
+ console.log('Browser i18n checks passed: both languages, mobile/desktop, strong two-line title, stable navigation, downloads offline, guide search, browser language detection, remembered manual choice, blocked storage, preserved queries and anchors, no JavaScript, reduced motion.');
 }finally{await browser.close();}

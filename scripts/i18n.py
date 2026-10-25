@@ -98,6 +98,7 @@ def build():
         source = path.read_text(encoding='utf-8')
         source = re.sub(r'<!-- language:start -->.*?<!-- language:end -->', '', source, flags=re.S)
         source = re.sub(r'<script[^>]*src="assets/language.js[^\"]*"[^>]*></script>', '', source)
+        source = re.sub(r'<script[^>]*src="assets/locale.js[^\"]*"[^>]*></script>', '', source)
         source = re.sub(r'<!-- seo:start -->.*?<!-- seo:end -->', '', source, flags=re.S)
         translator = Translator(catalog)
         translator.feed(source)
@@ -106,6 +107,7 @@ def build():
             ('es', source, path, ''), ('en', english, ROOT / 'en' / filename, '../')
         ):
             content = re.sub(r'<div class="navlinks">.*?</div>', navigation(filename, language), content, count=1, flags=re.S)
+            content = content.replace('<head>', f'<head><script src="{prefix}assets/locale.js"></script>', 1)
             content = content.replace('</body>', f'<script src="{prefix}assets/language.js" defer></script></body>')
             target.write_text(content, encoding='utf-8')
     print('Spanish and English pages generated; all English strings checked against the catalog.')
