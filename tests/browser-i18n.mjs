@@ -49,6 +49,18 @@ try {
    await page.setViewport({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${prefix} overflow at ${width}`);
    assert.equal(await page.$eval('.language-switch',el=>el.getBoundingClientRect().right>innerWidth),false);
+   const menuFits=await page.evaluate(()=>{
+    const menu=document.querySelector('.language-switch');menu.open=true;
+    const bounds=menu.querySelector('.language-options').getBoundingClientRect();
+    const fits=bounds.left>=0&&bounds.right<=innerWidth;menu.open=false;return fits;
+   });
+   assert.ok(menuFits,`Language menu must fit viewport at ${width}px`);
+   if(language==='en'){
+    assert.ok(await page.$eval('.friendly-hero h1',heading=>[...heading.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim()).every(node=>{
+     const range=document.createRange();range.selectNodeContents(node);
+     return range.getClientRects().length===1&&range.getBoundingClientRect().width<=heading.clientWidth+1;
+    })),`English headline must have exactly two unbroken lines at ${width}px`);
+   }
    navAtWidth.set(width,await navPositions(page));
   }
   // Keep the accordion trigger and viewport still while its answer expands.
