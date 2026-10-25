@@ -35,6 +35,16 @@ El visor admite ratón y teclado. Las preguntas tienen una sola respuesta activa
 
 El recorrido del inicio se reproduce automáticamente cuando el visor entra en pantalla. Se puede pausar; también se detiene fuera de pantalla o al cambiar de pestaña, y pausa al interactuar con ratón o teclado. Con movimiento reducido no arranca automáticamente.
 
+Las pausas por visibilidad son temporales: el recorrido continúa al volver a la pestaña o al visor. La pausa manual se conserva. El cursor que ya estaba situado encima al cargar no bloquea el inicio.
+
 ## Documentación de uso
 
 `docs.html` se genera con `scripts/docs.py` durante el build. Sus doce secciones se contrastaron con la interfaz y el código del tag `alpha-0.0.2`, incluido el exportador ZIP publicado. La guía distingue esa versión del kit de armado en desarrollo. Incluye índice, búsqueda local, capturas reales, controles, atajos, límites y solución de problemas. La guía también funciona sin JavaScript.
+
+## SEO
+
+`scripts/seo.py` genera títulos y descripciones propios para ambas páginas, canónicos absolutos, Open Graph, Twitter Cards y datos estructurados WebSite, WebPage, SoftwareApplication, TechArticle y BreadcrumbList. No incluye valoraciones inventadas ni promesas de resultados enriquecidos.
+
+El sitemap público está en `https://arnulfovargas.github.io/BlendParser/sitemap.xml`. Puede enviarse a Search Console al verificar la propiedad. Esta web es un sitio de proyecto bajo `/BlendParser/`; no controla el `robots.txt` raíz de `arnulfovargas.github.io`, por lo que usa meta robots y un sitemap propio en lugar de un robots de subcarpeta ineficaz.
+
+Las imágenes incluyen dimensiones intrínsecas y carga diferida salvo el producto inicial. CSS y JavaScript reciben una versión de contenido para que un navegador no conserve una implementación anterior después del despliegue. La imagen social, `assets/social-preview.png`, tiene 1200 × 630 px y se creó con una captura real; su composición está en `scripts/social-preview.html`.

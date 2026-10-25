@@ -33,6 +33,8 @@ jobs:
         run: python scripts/build.py
       - name: Check page links
         run: python scripts/check_links.py
+      - name: Verify SEO output
+        run: python scripts/check_seo.py
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - uses: actions/upload-pages-artifact@5f327015a708106f6f1b7c9a633901af30fe80cb
         with:

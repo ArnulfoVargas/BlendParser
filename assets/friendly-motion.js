@@ -4,35 +4,41 @@ const dock=document.querySelector('.download-dock');
 const tour=document.querySelector('[data-tour]');
 const play=tour?.querySelector('[data-play-tour]');
 const tabs=[...(tour?.querySelectorAll('[data-shot]')||[])];
-let timer=null,playing=false,tourVisible=true,autoStarted=false;
-const stop=()=>{
- playing=false;clearTimeout(timer);timer=null;
- if(play){play.textContent='Reproducir recorrido';play.setAttribute('aria-pressed','false');}
+let timer=null,playing=motionAllowed.matches,tourVisible=false,started=false,hoverPaused=false,focusPaused=false;
+const renderPlayback=()=>{
+ if(play){play.textContent=playing?'Pausar recorrido':'Reproducir recorrido';play.setAttribute('aria-pressed',String(playing));}
 };
+const syncPlayback=()=>{
+ clearTimeout(timer);timer=null;renderPlayback();
+ if(playing&&tourVisible&&!document.hidden&&!hoverPaused&&!focusPaused)timer=setTimeout(advance,3000);
+};
+const stop=()=>{playing=false;syncPlayback();};
 const advance=()=>{
- if(!playing||document.hidden||!tourVisible)return;
+ if(!playing||document.hidden||!tourVisible||hoverPaused||focusPaused){syncPlayback();return;}
  const current=tabs.findIndex(b=>b.getAttribute('aria-pressed')==='true');
  tabs[(current+1)%tabs.length].click();
- timer=setTimeout(advance,3000);
+ syncPlayback();
 };
 const start=()=>{
- if(playing||!play)return;
- playing=true;play.textContent='Pausar recorrido';play.setAttribute('aria-pressed','true');
- tabs[0]?.click();
- if(!tour.matches(':hover'))timer=setTimeout(advance,3000);
+ if(!play)return;
+ playing=true;hoverPaused=false;focusPaused=false;
+ if(!started){started=true;tabs[0]?.click();}
+ syncPlayback();
 };
-play?.addEventListener('click',()=>{autoStarted=true;if(playing)stop();else start();});
-// Automatic playback pauses while the visitor handles a capture or leaves it.
-tour?.addEventListener('pointerenter',()=>{if(playing)clearTimeout(timer);});
-tour?.addEventListener('pointerleave',()=>{if(playing&&(!tour.contains(document.activeElement)||document.activeElement===play)){clearTimeout(timer);timer=setTimeout(advance,3000);}});
-tour?.addEventListener('focusin',event=>{if(event.target!==play&&playing)clearTimeout(timer);});
-tour?.addEventListener('focusout',()=>{if(playing){clearTimeout(timer);timer=setTimeout(advance,3000);}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else if(tourVisible&&!autoStarted&&motionAllowed.matches){autoStarted=true;start();}});
+play?.addEventListener('click',()=>{if(playing)stop();else start();});
+// Incidental pointer placement during load must not suppress autoplay.
+// Pause after actual pointer movement, then resume when it leaves the viewer.
+tour?.addEventListener('pointermove',event=>{if(event.pointerType==='mouse'){hoverPaused=true;syncPlayback();}});
+tour?.addEventListener('pointerleave',()=>{hoverPaused=false;syncPlayback();});
+tour?.addEventListener('focusin',event=>{focusPaused=event.target!==play;syncPlayback();});
+tour?.addEventListener('focusout',()=>{queueMicrotask(()=>{focusPaused=tour.contains(document.activeElement)&&document.activeElement!==play;syncPlayback();});});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)hoverPaused=false;syncPlayback();});
 if(tour)new IntersectionObserver(entries=>{
  tourVisible=entries[0].isIntersecting;
- if(!tourVisible)stop();
- else if(!autoStarted&&motionAllowed.matches&&!document.hidden){autoStarted=true;start();}
+ if(!tourVisible)hoverPaused=false;
+ if(tourVisible&&playing&&!started)start();else syncPlayback();
 },{threshold:.1}).observe(tour);
+renderPlayback();
 if(hero&&dock)new IntersectionObserver(entries=>{
  const show=!entries[0].isIntersecting&&entries[0].boundingClientRect.bottom<0;
  dock.hidden=!show;

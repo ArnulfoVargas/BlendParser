@@ -14,14 +14,15 @@ for(const group of document.querySelectorAll('[data-capture-switch]')) {
   const next=new Image();
   next.onload=()=>{
    if(ticket!==request)return;
+   const unchanged=image.src===next.src;
    let old;
-   if(document.body.classList.contains('four')&&!reduceMotion.matches){
+   if(!unchanged&&document.body.classList.contains('four')&&!reduceMotion.matches){
     old=image.cloneNode();old.removeAttribute('data-capture-image');old.alt='';old.setAttribute('aria-hidden','true');old.classList.add('outgoing-capture');image.parentElement.append(old);
    }
    image.src=next.src;image.alt=b.dataset.caption;
    image.closest('a').href=next.src;
    caption.textContent=b.dataset.caption;
-   if(!reduceMotion.matches){
+   if(!unchanged&&!reduceMotion.matches){
     if(old){
      old.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(-28px)'}],{duration:420,easing:'ease-in-out'}).finished.then(()=>old.remove(),()=>old.remove());
      image.animate([{opacity:0,transform:'translateX(28px)'},{opacity:1,transform:'translateX(0)'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'});
