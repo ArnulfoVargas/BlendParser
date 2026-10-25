@@ -1,0 +1,25 @@
+{
+  "release": "alpha-0.0.5",
+  "source": "Published Windows MSI, extracted without installation; real Tauri WebView screenshots",
+  "model": "spider_hito2v5_optimizada-3d-texturizado-v21.blend",
+  "height_mm": 75,
+  "printer": "Bambu Lab A1",
+  "nozzle_mm": 0.4,
+  "viewport": [
+    1600,
+    1000
+  ],
+  "language": "es",
+  "captures": [
+    "blendparser-app.png",
+    "resultado.png",
+    "original.png",
+    "tamano.png",
+    "medir.png",
+    "placa-torre.png",
+    "desperdicio.png",
+    "impresoras.png",
+    "preferencias.png"
+  ],
+  "blender_captures": "Existing real Blender 5.0 screenshots of the same source model retained"
+}

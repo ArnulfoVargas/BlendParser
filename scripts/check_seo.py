@@ -42,7 +42,7 @@ for name,url in [('index.html',BASE),('docs.html',BASE+'docs.html'),('en/index.h
  schema=page.schemas[0]['@graph']
  assert schema[1]['inLanguage']==language and schema[2]['inLanguage']==language
  assert schema[2]['@type']==('TechArticle' if name.endswith('docs.html') else 'WebPage')
- assert len(schema[2].get('articleSection',[]))==(12 if name.endswith('docs.html') else 0)
+ assert len(schema[2].get('articleSection',[]))==(13 if name.endswith('docs.html') else 0)
 assert len(set(titles))==4 and len(set(descriptions))==4
 sitemap=ET.parse(ROOT/'sitemap.xml');assert [node.text for node in sitemap.findall('.//{*}loc')]==[BASE,BASE+'docs.html',BASE+'en/',BASE+'en/docs.html']
 with (ROOT/'assets/social-preview.png').open('rb') as file:header=file.read(24)
