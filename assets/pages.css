@@ -17,7 +17,7 @@
 @font-face { font-family: 'Schibsted Grotesk'; src: url('./display.woff2') format('woff2'); font-weight: 700; font-display: swap; }
 :root { --container: 1376px; --gutter: 48px; --color-clear: transparent; --color-dark: #123c2e; --color-on-dark: #faf8ef; --color-mint: #d2eddf; --color-pink: #f3d9ce; --color-yellow: #f6e9b9; --color-blue: #d9e8ef; --color-shadow: #143d2c15; --rule: 1px solid var(--color-rule); --radius-large: 24px; }
 * { box-sizing: border-box; }
-html { overflow-x: clip; scroll-behavior: smooth; }
+html { overflow-x: clip; scroll-behavior: smooth; scrollbar-gutter:stable; overflow-anchor:none; }
 body { margin: 0; overflow-x: clip; background: var(--color-paper); color: var(--color-ink); font: 400 17px/1.55 var(--font-body); }
 img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 5px; }
@@ -344,6 +344,9 @@ html { caret-color:var(--color-accent); }
 .four .friendly-opening :focus-visible { outline-color:var(--color-focus); }
 .four .friendly-hero { grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); }
 .four .friendly-hero h1 { font-size:clamp(72px,7.3vw,106px); max-width:9ch; }
+/* Scale to the actual text column: keep the two lines large without wrapping. */
+html[lang='en'] .friendly-hero > div:first-child { container-type:inline-size; }
+html[lang='en'] .four .friendly-hero h1 { font-size:clamp(32px,17.5cqi,106px); max-width:none; white-space:nowrap; }
 .four .friendly-hero .lead { color:var(--color-ink-2); }
 .four .friendly-opening .button { background:var(--color-accent); color:var(--color-accent-ink); box-shadow:inset 0 1px 0 var(--color-accent-soft),0 3px 0 var(--color-accent-deep); }
 .four .friendly-opening .button:hover { background:var(--color-accent-deep); }
@@ -462,3 +465,30 @@ html { caret-color:var(--color-accent); }
  .four nav .navlinks,.docs-page > header > nav .navlinks { width:100%; justify-content:space-between; }
 }
 @media(prefers-reduced-motion:reduce) { .navlinks a,.navlinks .nav-action { transition:none; } }
+.language-switch { position:relative; flex-shrink:0; font-size:14px; }
+.language-switch summary { display:flex; align-items:center; gap:var(--space-xs); min-height:40px; padding:8px 10px; border:var(--rule); border-radius:var(--radius-input); background:var(--color-paper); cursor:pointer; list-style:none; transition:background-color var(--dur-short) var(--ease-out),border-color var(--dur-short) var(--ease-out); }
+.language-switch summary::-webkit-details-marker { display:none; }
+.language-switch summary::marker { content:''; }
+.language-switch summary:hover,.language-switch[open] summary { background:var(--color-paper-3); border-color:var(--color-accent); }
+.language-chevron { transition:transform var(--dur-short) var(--ease-out); }
+.language-switch[open] .language-chevron { transform:rotate(180deg); }
+.language-code { display:none; }
+.language-options { position:absolute; left:0; top:calc(100% + 8px); z-index:var(--z-dropdown); min-width:164px; padding:6px; border:var(--rule); border-radius:var(--radius-card); background:var(--color-paper); box-shadow:var(--shadow-card); }
+.navlinks .language-options a { display:flex; align-items:center; justify-content:space-between; min-height:40px; margin:0; padding:8px 10px; font-size:14px; border-radius:var(--radius-input); text-decoration:none; }
+.language-options a::after { content:'✓'; margin-left:var(--space-lg); visibility:hidden; }
+.language-options a[aria-current='true']::after { visibility:visible; }
+.language-switch a[aria-current='true'] { background:var(--color-paper-3); color:var(--color-accent-deep); }
+.language-switch a:hover { background:var(--color-paper-3); }
+.navlinks { gap:var(--space-lg); }
+.navlinks > a:not(.nav-action) { padding:8px; margin-inline:-8px; }
+.navlinks .nav-action { flex-shrink:0; padding:8px 14px; text-align:center; }
+/* Shared navigation markup and stable labels keep landing and guide aligned. */
+nav.container > .brand { width:190px; flex-shrink:0; }
+@media(max-width:700px) {
+ .four nav .navlinks,.docs-page > header > nav .navlinks { gap:var(--space-xs); }
+ .language-switch summary { gap:6px; padding:8px; }
+ .language-icon { display:none; }
+ .language-name { display:none; }
+ .language-code { display:inline; }
+ .navlinks .nav-action { padding:8px 10px; }
+}

@@ -18,7 +18,7 @@ class SEO(HTMLParser):
   if self.ld:self.buffer+=data
   if self.title:self.title_text+=data
 titles=[];descriptions=[]
-for name,url in [('index.html',BASE),('docs.html',BASE+'docs.html')]:
+for name,url in [('index.html',BASE),('docs.html',BASE+'docs.html'),('en/index.html',BASE+'en/'),('en/docs.html',BASE+'en/docs.html')]:
  page=SEO(ROOT/name);titles.append(page.title_text)
  metas={a.get('name',a.get('property')):a.get('content') for t,a in page.tags if t=='meta'}
  assert 20<len(page.title_text)<75 and 'BlendParser' in page.title_text
@@ -30,13 +30,21 @@ for name,url in [('index.html',BASE),('docs.html',BASE+'docs.html')]:
  assert 'aggregateRating' not in json.dumps(page.schemas)
  for tag,a in page.tags:
   asset=a.get('src') if tag=='script' else a.get('href') if tag=='link' and a.get('rel')=='stylesheet' else None
-  if asset and asset.startswith('assets/'):
-   parsed=urlsplit(asset);assert parse_qs(parsed.query)['v']==[hashlib.sha256((ROOT/parsed.path).read_bytes()).hexdigest()[:12]]
+  if asset and asset.startswith(('assets/','../assets/')):
+   parsed=urlsplit(asset);assert parse_qs(parsed.query)['v']==[hashlib.sha256((ROOT/name).parent.joinpath(parsed.path).read_bytes()).hexdigest()[:12]]
   if tag=='img':
    assert int(a['width'])>0 and int(a['height'])>0
    if a.get('fetchpriority')=='high':assert a.get('loading')!='lazy'
-assert len(set(titles))==2 and len(set(descriptions))==2
-sitemap=ET.parse(ROOT/'sitemap.xml');assert [node.text for node in sitemap.findall('.//{*}loc')]==[BASE,BASE+'docs.html']
+ assert {(a['hreflang'],a['href']) for t,a in page.tags if t=='link' and a.get('rel')=='alternate'}=={('es',BASE+('docs.html' if name.endswith('docs.html') else '')),('en',BASE+'en/'+('docs.html' if name.endswith('docs.html') else '')),('x-default',BASE+('docs.html' if name.endswith('docs.html') else ''))}
+ language='en' if name.startswith('en/') else 'es'
+ assert next(a['lang'] for t,a in page.tags if t=='html')==language
+ assert metas['og:locale']==('en_US' if language=='en' else 'es_MX')
+ schema=page.schemas[0]['@graph']
+ assert schema[1]['inLanguage']==language and schema[2]['inLanguage']==language
+ assert schema[2]['@type']==('TechArticle' if name.endswith('docs.html') else 'WebPage')
+ assert len(schema[2].get('articleSection',[]))==(12 if name.endswith('docs.html') else 0)
+assert len(set(titles))==4 and len(set(descriptions))==4
+sitemap=ET.parse(ROOT/'sitemap.xml');assert [node.text for node in sitemap.findall('.//{*}loc')]==[BASE,BASE+'docs.html',BASE+'en/',BASE+'en/docs.html']
 with (ROOT/'assets/social-preview.png').open('rb') as file:header=file.read(24)
 assert struct.unpack('>II',header[16:24])==(1200,630)
 print('SEO checks passed: canonical, metadata, social image, structured data, image dimensions, cache versions and sitemap.')

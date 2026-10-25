@@ -1,4 +1,5 @@
 const motionAllowed=matchMedia('(prefers-reduced-motion: no-preference)');
+const tourLabels=document.documentElement.lang==='en'?['Pause tour','Play tour']:['Pausar recorrido','Reproducir recorrido'];
 const hero=document.querySelector('.friendly-opening');
 const dock=document.querySelector('.download-dock');
 const tour=document.querySelector('[data-tour]');
@@ -6,7 +7,7 @@ const play=tour?.querySelector('[data-play-tour]');
 const tabs=[...(tour?.querySelectorAll('[data-shot]')||[])];
 let timer=null,playing=motionAllowed.matches,tourVisible=false,started=false,hoverPaused=false,focusPaused=false;
 const renderPlayback=()=>{
- if(play){play.textContent=playing?'Pausar recorrido':'Reproducir recorrido';play.setAttribute('aria-pressed',String(playing));}
+ if(play){play.textContent=tourLabels[playing?0:1];play.setAttribute('aria-pressed',String(playing));}
 };
 const syncPlayback=()=>{
  clearTimeout(timer);timer=null;renderPlayback();

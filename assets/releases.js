@@ -1,5 +1,8 @@
 export const REPO='ArnulfoVargas/blend-parser-app';
 const FALLBACK=`https://github.com/${REPO}/releases`;
+const messages=()=>globalThis.document?.documentElement.lang==='en'
+ ? {download:'Download for',downloads:'View downloads',preview:'Preview release',fallback:'Check available releases on GitHub.'}
+ : {download:'Descargar para',downloads:'Ver descargas',preview:'Versión preliminar',fallback:'Consulta las versiones disponibles en GitHub.'};
 export function selectRelease(releases){
  return [...releases].filter(r=>!r.draft&&r.published_at&&(r.assets||[]).some(a=>/\.(exe|msi|AppImage|deb|rpm)$/i.test(a.name))).sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at))[0]||null;
 }
@@ -18,10 +21,10 @@ function render(release){
  const platform=platformName(),preferred=preferredAsset(release,platform);
  for(const link of document.querySelectorAll('[data-download]')){
   link.href=preferred?.browser_download_url||(release.html_url?.startsWith(`https://github.com/${REPO}/releases/tag/`)?release.html_url:FALLBACK);
-  link.textContent=preferred?`Descargar para ${platform==='windows'?'Windows':'Linux'}`:'Ver descargas';
+  if(!link.classList.contains('nav-action'))link.textContent=preferred?`${messages().download} ${platform==='windows'?'Windows':'Linux'}`:messages().downloads;
  }
  const status=document.querySelector('[data-release-status]');
- if(status)status.textContent=`${release.tag_name}${release.prerelease?' · Versión preliminar':''}`;
+ if(status)status.textContent=`${release.tag_name}${release.prerelease?' · '+messages().preview:''}`;
  const list=document.querySelector('[data-release-assets]');
  if(list){
   const links=installerAssets(release).map(asset=>{
@@ -46,6 +49,6 @@ export async function loadRelease(){
   if(!response.ok)throw new Error('GitHub releases unavailable');
   const release=selectRelease(await response.json());
   if(release){render(release);try{sessionStorage.setItem('blendparser-release',JSON.stringify({at:Date.now(),release}));}catch{}}
- }catch{if(!snapshot?.release){const status=document.querySelector('[data-release-status]');if(status)status.textContent='Consulta las versiones disponibles en GitHub.';}}
+ }catch{if(!snapshot?.release){const status=document.querySelector('[data-release-status]');if(status)status.textContent=messages().fallback;}}
  finally{clearTimeout(timeout);}
 }

@@ -1,0 +1,21 @@
+name: Verify static site
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+      - name: Test release selection
+        run: node --test tests/*.test.mjs
+      - name: Build both languages
+        run: python scripts/build.py
+      - name: Check translations and repeatable output
+        run: python tests/i18n_test.py
+      - name: Check links and SEO
+        run: |
+          python scripts/check_links.py
+          python scripts/check_seo.py

@@ -12,13 +12,13 @@ class Page(HTMLParser):
    self.ids.add(attrs['id'])
   for key in ('href','src'):
    if attrs.get(key):self.links.append(attrs[key])
-pages={path.name:Page(path) for path in ROOT.glob('*.html')}
+pages={path.resolve():Page(path) for path in [*ROOT.glob('*.html'),*(ROOT/'en').glob('*.html')]}
 for page in pages.values():
  for link in page.links:
   u=urlsplit(link)
   if u.scheme or u.netloc:continue
-  filename=unquote(u.path) or page.path.name
-  if filename=='./':filename='index.html'
-  assert (ROOT/filename).exists(),f'Missing local link: {page.path.name} -> {link}'
-  if u.fragment and filename in pages:assert unquote(u.fragment) in pages[filename].ids,f'Missing anchor: {link}'
+  target=(page.path.parent/unquote(u.path)).resolve() if u.path else page.path.resolve()
+  if target.is_dir():target=target/'index.html'
+  assert target.exists(),f'Missing local link: {page.path.name} -> {link}'
+  if u.fragment and target in pages:assert unquote(u.fragment) in pages[target].ids,f'Missing anchor: {link}'
 print(f'Local links, assets, anchors and unique IDs passed for {len(pages)} pages.')

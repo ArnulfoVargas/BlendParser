@@ -29,7 +29,7 @@ for(const group of document.querySelectorAll('[data-capture-switch]')) {
     }else image.animate([{opacity:.55},{opacity:1}],{duration:240,easing:'ease-out'});
    }
   };
-  next.src=`assets/${b.dataset.shot}.png`;
+  next.src=new URL(`${b.dataset.shot}.png`,document.querySelector('script[src*="interactions.js"]').src).href;
  }
  buttons.forEach((b,i)=>b.addEventListener('click',()=>select(i)));
  group.addEventListener('keydown',e=>{

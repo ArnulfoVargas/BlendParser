@@ -1,7 +1,6 @@
 import {loadRelease} from './releases.js';
 loadRelease();
 const index=document.querySelector('.doc-index');
-if(matchMedia('(max-width:700px)').matches)index.open=false;
 const search=document.querySelector('#doc-search');
 const sections=[...document.querySelectorAll('[data-doc-section]')];
 const links=[...index.querySelectorAll('a')];
@@ -14,7 +13,7 @@ function filter(){
   if(!section.hidden)count++;
   const link=links.find(a=>a.hash==='#'+section.id);if(link)link.hidden=section.hidden;
  }
- status.textContent=query?`${count} de ${sections.length} secciones.`:'';
+ status.textContent=query?(document.documentElement.lang==='en'?`${count} of ${sections.length} sections.`:`${count} de ${sections.length} secciones.`):'';
  document.querySelector('.doc-empty').hidden=count!==0;
 }
 search.addEventListener('input',filter);

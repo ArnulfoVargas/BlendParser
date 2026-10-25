@@ -13,7 +13,24 @@ python scripts/sync_releases.py
 python scripts/build.py
 python -m http.server 8766 --directory dist
 node --test tests/*.test.mjs
+python scripts/check_links.py
+python scripts/check_seo.py
+python tests/i18n_test.py
 ```
+
+## Idiomas
+
+La landing y la guía están disponibles en español (`/` y `/docs.html`) e inglés (`/en/` y `/en/docs.html`). El dropdown antes de Inicio conserva la sección actual y funciona sin JavaScript. La navegación entre inicio y documentación mantiene la misma distribución.
+
+Al entrar por una URL sin prefijo, `assets/locale.js` detecta el idioma antes de pintar la página: primero una elección explícita `?lang=es` o `?lang=en`, después la elección manual guardada en `localStorage` y por último la primera preferencia compatible de `navigator.languages` (o `navigator.language`). Reconoce variantes como `es-MX` y `en-GB`; si no hay un idioma compatible, usa inglés. Las URLs `/en/` y `/en/docs.html` son explícitas y se respetan salvo que lleven un parámetro `lang` diferente. Se conservan query y ancla al redirigir, incluido el prefijo `/BlendParser/`.
+
+El dropdown recuerda tu elección y añade `lang` al enlace para funcionar incluso con almacenamiento bloqueado. Esa elección se transmite a los enlaces de inicio y guía. Sin JavaScript se respeta la URL y ambos idiomas siguen accesibles desde el menú.
+
+El HTML español es la fuente compartida: `index.html` y la guía generada por `scripts/docs.py`. `scripts/i18n.py` genera las páginas inglesas con el catálogo `locales/en.json`; no edites `en/*.html` directamente. Al cambiar texto español, actualiza también el catálogo. El build falla si falta una traducción de contenido, etiquetas de accesibilidad, pies de captura o placeholders. Los mensajes dinámicos se traducen en `assets/releases.js`, `assets/docs.js` y `assets/friendly-motion.js`. Las capturas reales se comparten entre idiomas y conservan el texto de la aplicación original.
+
+El build genera canónicos y metadatos propios, enlaces `hreflang` recíprocos y un sitemap con las cuatro páginas. Para agregar otro idioma, amplía el generador, el catálogo, los mensajes dinámicos y la configuración SEO, junto con las verificaciones.
+
+Las PR a `main` ejecutan el build, las pruebas de descargas, traducciones, enlaces y SEO. La verificación opcional de navegador está en `tests/browser-i18n.mjs`: requiere `puppeteer-core` y Chrome, acepta `BP_BROWSER_TOOLS` para reutilizar una instalación local de Puppeteer, `BP_CHROME` para el ejecutable y `BP_SITE_URL` para el servidor de `dist/` (por defecto `http://127.0.0.1:8768/`).
 
 ## GitHub Pages
 
